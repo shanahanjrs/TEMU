@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "utils.h"
 
 #define arr_len(x) (sizeof(x)/sizeof(x[0]))
@@ -6,7 +7,7 @@
 #define MEMORYSIZE 64
 #define MEMPRNTWIDTH 16
 
-int main()
+int main(int argc, char *argv[])
 {
     // These are for debugging
     int max_cycles = 100;
@@ -21,13 +22,37 @@ int main()
 
     int MEM[MEMORYSIZE] = {0x0};
 
-    /* Programs arent loaded from a file yet */
+    /* Load program from file, either the specified filename or we default to "prog.bin" */
+    char *program_path;
+    if (argc > 1) {
+        program_path = argv[1];
+    } else {
+        program_path = "prog.bin";
+    }
+
+    char *buffer = file_read(program_path);
+    char *tokens;
+    if (!buffer) {
+        printf("File could not be read or was empty.\n");
+        exit(1);
+    }
+
+    /* split program into an array */
+    int ROM[64]; // arbitrary size for now
+    int i_c = 0;
+
+    tokens = strtok(buffer, " \n");
+    while (tokens != NULL) {
+        ROM[i_c] = (int) strtol(tokens, NULL, 16);
+        i_c++;
+        tokens = strtok(NULL, " \n");
+    }
 
     // Debugs, sets A to 0xff, then prints A
     //int ROM[] = {0x2, 0x5, 0xA, 0x99, 0x1, 0xff};
 
     // Debugs, sets A to 0xA, then Mul by 2
-    int ROM[] = {0x99, 0x2, 0x8, 0x6, 0x9, 0xA, 0x1, 0x0, 0xA, 0x2};
+    //int ROM[] = {0x99, 0x2, 0x8, 0x6, 0x9, 0xA, 0x1, 0x0, 0xA, 0x2};
 
     // Debug, set A to 255, print out A, loop forever via JMP to the print
     //int ROM[] = {0x99, 0x2, 0x6, 0xA, 0x9, 0x3, 0xff };
@@ -42,28 +67,7 @@ int main()
         }
 
         switch (MEM[PC]) {
-            /*
-             * Opcode table
-             * done | code     | desc
-             * -----------------------------------------------------------------------------
-             * [X]  | 0x99     | DBG -> Dump hardware state to console
-             * [X]  | 0x0      | NOP -> no op
-             * [X]  | 0x1      | HLT -> Halt
-             * [X]  | 0x2      | LDA -> load %addr to reg A
-             * [X]  | 0x3      | LDB -> load %addr to B
-             * [X]  | 0x4      | ADD -> add %addr to A then store in A
-             * [X]  | 0x5      | SUB
-             * [X]  | 0x6      | MUL
-             * [X]  | 0x7      | DIV
-             * [X]  | 0x8      | MOV
-             * [X]  | 0x9      | JMP -> Set PC to val in %addr
-             * [X]  | 0xA      | PRNT -> print A to console
-             * [X]  | 0xB      | CMP -> %addr1 < %addr2 :: ZF=0,CF=1
-             *                          %addr1 > %addr2 :: ZF=0,CF=0
-             *                          %addr1 = %addr2 :: ZF=1,CF=0
-             * [X]  | 0xC      | JC -> Jmp if Carry == 1
-             * [X]  | 0xD      | JZ -> Jmp if Zero == 1
-             */
+
             case 0x99 : // DBG
             {
                 printf("======= Memory: ========\n");

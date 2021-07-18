@@ -4,7 +4,7 @@
 
 `<program>.tas` -> **T**iny **AS**sembly file, write code here
 
-`$ ./assembler <program>.tas` -> Compile your program
+`$ ./assembler <program>.tas > <program>.bin` -> Compile your program
 
 `$ ./main <program>.bin` -> Run
 

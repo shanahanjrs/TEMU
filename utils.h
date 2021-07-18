@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 void print_arr(size_t s, int memprintwidth, int x[])
 {
@@ -25,5 +26,24 @@ void mem_load(size_t s, int offset, int dest[], int src[])
      */
     for (int i=0; i<s; i++) {
         dest[offset+i] = src[i];
+    }
+}
+
+char* file_read(char *filename) {
+    FILE *f = fopen(filename, "rb");
+    char *buffer = 0;
+    long length;
+
+    if (f) {
+        fseek(f, 0, SEEK_END);
+        length = ftell(f);
+        fseek(f, 0, SEEK_SET);
+        buffer = malloc(length);
+        if (buffer) {
+            fread(buffer, 1, length, f);
+        }
+        fclose(f);
+
+        return buffer;
     }
 }

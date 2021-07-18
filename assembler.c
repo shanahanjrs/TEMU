@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "utils.h"
 
 #define arr_len(x) (sizeof(x)/sizeof(x[0]))
 
@@ -32,7 +33,6 @@ int main(int argc, char *argv[])
     char *output_file;
     char *buffer = 0;
     char *tokens;
-    long length;
 
     if (argc < 2) {
         printf("Input filename required.\n");
@@ -46,28 +46,17 @@ int main(int argc, char *argv[])
     }
 
     // open and read ASM file
-    FILE *f = fopen(input_file, "rb");
-    if (f) {
-        fseek(f, 0, SEEK_END);
-        length = ftell(f);
-        fseek(f, 0, SEEK_SET);
-        buffer = malloc(length);
-        if (buffer)
-        {
-            fread(buffer, 1, length, f);
-        }
-        fclose(f);
+    buffer = file_read(input_file);
+    if (!buffer) {
+        printf("File could not be read or was empty.\n");
+        exit(1);
     }
 
     // tokenize
-    if (buffer) {
-        // https://www.cplusplus.com/reference/cstring/strtok/
-        tokens = strtok(buffer, " \n");
-
-        while (tokens != NULL) {
-            printf("%s ", asm_to_hex(tokens));
-            tokens = strtok(NULL, " \n");
-        }
+    tokens = strtok(buffer, " \n");
+    while (tokens != NULL) {
+        printf("%s ", asm_to_hex(tokens));
+        tokens = strtok(NULL, " \n");
     }
 
     printf("\n");
