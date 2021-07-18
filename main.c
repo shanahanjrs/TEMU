@@ -38,25 +38,29 @@ int main(int argc, char *argv[])
     }
 
     /* split program into an array */
-    int ROM[64]; // arbitrary size for now
+    int TMP_ROM[MEMORYSIZE]; // load up to max mem size first, then trim down later
     int i_c = 0;
 
     tokens = strtok(buffer, " \n");
     while (tokens != NULL) {
-        ROM[i_c] = (int) strtol(tokens, NULL, 16);
+        TMP_ROM[i_c] = (int) strtol(tokens, NULL, 16);
         i_c++;
         tokens = strtok(NULL, " \n");
+    }
+
+    /* trim down the ROM */
+    int ROM[i_c];
+    for (int i=0; i<i_c; i++) {
+        ROM[i] = TMP_ROM[i];
     }
 
     // Debugs, sets A to 0xff, then prints A
     //int ROM[] = {0x2, 0x5, 0xA, 0x99, 0x1, 0xff};
 
-    // Debugs, sets A to 0xA, then Mul by 2
-    //int ROM[] = {0x99, 0x2, 0x8, 0x6, 0x9, 0xA, 0x1, 0x0, 0xA, 0x2};
-
     // Debug, set A to 255, print out A, loop forever via JMP to the print
     //int ROM[] = {0x99, 0x2, 0x6, 0xA, 0x9, 0x3, 0xff };
 
+    /* Load the ROM into memory */
     mem_load(arr_len(ROM), 0, MEM, ROM);
 
     while (!HALT) {
@@ -88,7 +92,6 @@ int main(int argc, char *argv[])
 
             case 0x1 : // HLT
             {
-                printf("Goodbye.\n");
                 HALT = 1;
                 break;
             }
